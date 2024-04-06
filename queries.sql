@@ -1,4 +1,4 @@
-количество уникальных покупателей в таблице customers:
+--количество уникальных покупателей в таблице customers:
 select
 COUNT(customer_id) as customers_count
 from customers;
@@ -52,3 +52,46 @@ seller,
 day_of_week,
 income
 from tab;
+
+--количество покупателей по возрастным группам:
+select
+case
+when c.age between 16 and 25 then '16-25'
+when c.age between 26 and 40 then '26-40'
+when age > 40 then '40+'
+end as age_category,
+COUNT(c.age) as age_count
+from customers c
+group by age_category
+order by age_category;
+
+--количество покупателей и выручка по месяцам:
+select
+to_char(sale_date, 'YYYY-MM') as selling_month,
+COUNT(distinct customer_id) as total_customers,
+FLOOR(SUM(s.quantity * p.price)) as income
+from sales s
+left join products p on s.product_id = p.product_id 
+group by selling_month
+order by selling_month ASC;
+
+--покупатели, первая покупка которых пришлась на время проведения специальных акций:
+with tab as (
+select 
+distinct s.customer_id,
+p.price,
+first_value(s.sales_id) OVER(partition by s.customer_id order by s.sale_date asc, p.price asc) as sales_id
+from sales s  
+left join products p on s.product_id = p.product_id
+where price = 0
+)
+
+select
+CONCAT(c.first_name, ' ', c.last_name) as customer,
+s.sale_date,
+CONCAT(e.first_name, ' ', e.last_name) as seller
+from sales s 
+left join customers c ON s.customer_id = c.customer_id 
+left join employees e on s.sales_person_id = e.employee_id
+where s.sales_id in (select tab.sales_id from tab)
+order by s.customer_id;
