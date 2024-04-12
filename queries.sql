@@ -6,7 +6,7 @@ from customers;
 --топ-10 продавцов по сумме выручки:
 select
 CONCAT(e.first_name, ' ', e.last_name) as seller,
-COUNT(s.sales_id),
+COUNT(s.sales_id) as operations,
 FLOOR(SUM(s.quantity * p.price)) as income
 from sales s
 left join products p on s.product_id = p.product_id
