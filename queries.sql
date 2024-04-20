@@ -7,21 +7,23 @@ select
     CONCAT(e.first_name, ' ', e.last_name) as seller,
     COUNT(s.sales_id) as operations,
     FLOOR(SUM(s.quantity * p.price)) as income
-from sales s
-left join products AS p on s.product_id = p.product_id
-inner join employees AS e on s.sales_person_id = e.employee_id
+from sales as s
+left join products as p on s.product_id = p.product_id
+inner join employees as e on s.sales_person_id = e.employee_id
 group by seller
 order by income desc
 limit 10;
 
 -- список продавцов выручка которых ниже средней выручки всех продавцов:
 with tab as (
-select
-    CONCAT(e.first_name, ' ', e.last_name) as seller,
-    FLOOR(AVG(s.quantity * p.price)) as average_income,
-    (select
-        FLOOR(AVG(s.quantity * p.price))
-        from sales AS s left join products AS p on s.product_id = p.product_id) as average_income_all
+    select
+        CONCAT(e.first_name, ' ', e.last_name) as seller,
+        FLOOR(AVG(s.quantity * p.price)) as average_income,
+        (select
+            FLOOR(AVG(s.quantity * p.price))
+        from sales as s
+        left join products as p on s.product_id = p.product_id)
+    as average_income_all
 from sales as s 
 left join products as p on s.product_id = p.product_id
 inner join employees as e on s.sales_person_id = e.employee_id
