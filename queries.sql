@@ -1,6 +1,5 @@
 --количество уникальных покупателей в таблице customers:
-select
-COUNT(customer_id) as customers_count
+select COUNT(customer_id) as customers_count
 from customers;
 
 --топ-10 продавцов по сумме выручки:
@@ -9,8 +8,8 @@ select
     COUNT(s.sales_id) as operations,
     FLOOR(SUM(s.quantity * p.price)) as income
 from sales s
-left join products p on s.product_id = p.product_id
-inner join employees e on s.sales_person_id = e.employee_id 
+left join products AS p on s.product_id = p.product_id
+inner join employees AS e on s.sales_person_id = e.employee_id
 group by seller
 order by income desc
 limit 10;
@@ -18,17 +17,19 @@ limit 10;
 -- список продавцов выручка которых ниже средней выручки всех продавцов:
 with tab as (
 select
-CONCAT(e.first_name, ' ', e.last_name) as seller,
-FLOOR(AVG(s.quantity * p.price)) as average_income,
-(select FLOOR(AVG(s.quantity * p.price)) from sales s left join products p on s.product_id = p.product_id) as average_income_all
-from sales s 
-left join products p on s.product_id = p.product_id
-inner join employees e on s.sales_person_id = e.employee_id
+    CONCAT(e.first_name, ' ', e.last_name) as seller,
+    FLOOR(AVG(s.quantity * p.price)) as average_income,
+    (select
+        FLOOR(AVG(s.quantity * p.price))
+        from sales AS s left join products AS p on s.product_id = p.product_id) as average_income_all
+from sales as s 
+left join products as p on s.product_id = p.product_id
+inner join employees as e on s.sales_person_id = e.employee_id
 group by seller)
 
 select
-seller,
-average_income
+    seller,
+    average_income
 from tab
 where average_income < average_income_all
 order by average_income asc;
@@ -48,9 +49,9 @@ order by day_number, seller
 )
 
 select
-seller,
-day_of_week,
-income
+    seller,
+    day_of_week,
+    income
 from tab;
 
 --количество покупателей по возрастным группам:
