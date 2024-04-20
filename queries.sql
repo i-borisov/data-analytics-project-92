@@ -19,9 +19,11 @@ with tab as (
     select
         CONCAT(e.first_name, ' ', e.last_name) as seller,
         FLOOR(AVG(s.quantity * p.price)) as average_income,
-        (select FLOOR(AVG(s.quantity * p.price))
+        (
+            select FLOOR(AVG(s.quantity * p.price))
             from sales as s
-            left join products as p on s.product_id = p.product_id)
+            left join products as p on s.product_id = p.product_id
+        )
         as average_income_all
     from sales as s
     left join products as p on s.product_id = p.product_id
@@ -83,7 +85,9 @@ with tab as (
     select distinct
         s.customer_id,
         p.price,
-        first_value(s.sales_id) OVER(partition by s.customer_id order by s.sale_date asc, p.price asc) as sales_id
+        FIRST_VALUE(s.sales_id) OVER(partition by s.customer_id
+            order by s.sale_date asc, p.price asc)
+        as sales_id
     from sales as s
     left join products as p on s.product_id = p.product_id
     where price = 0
