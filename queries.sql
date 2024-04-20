@@ -19,15 +19,15 @@ with tab as (
     select
         CONCAT(e.first_name, ' ', e.last_name) as seller,
         FLOOR(AVG(s.quantity * p.price)) as average_income,
-        (select
-            FLOOR(AVG(s.quantity * p.price))
+        (select FLOOR(AVG(s.quantity * p.price))
         from sales as s
         left join products as p on s.product_id = p.product_id)
     as average_income_all
-from sales as s 
-left join products as p on s.product_id = p.product_id
-inner join employees as e on s.sales_person_id = e.employee_id
-group by seller)
+        from sales as s
+    left join products as p on s.product_id = p.product_id
+    inner join employees as e on s.sales_person_id = e.employee_id
+    group by seller
+    )
 
 select
     seller,
