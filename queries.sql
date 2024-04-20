@@ -86,13 +86,14 @@ with tab as (
         s.customer_id,
         p.price,
         FIRST_VALUE(s.sales_id)
-            over (partition by s.customer_id
-            order by s.sale_date asc, p.price asc)
+            over (
+                partition by s.customer_id
+                order by s.sale_date asc, p.price asc)
         as sales_id
     from sales as s
     left join products as p on s.product_id = p.product_id
     where p.price = 0
-)
+        )
 
 select
     CONCAT(c.first_name, ' ', c.last_name) as customer,
