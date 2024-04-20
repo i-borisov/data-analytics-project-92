@@ -20,14 +20,14 @@ with tab as (
         CONCAT(e.first_name, ' ', e.last_name) as seller,
         FLOOR(AVG(s.quantity * p.price)) as average_income,
         (select FLOOR(AVG(s.quantity * p.price))
-        from sales as s
-        left join products as p on s.product_id = p.product_id)
+            from sales as s
+            left join products as p on s.product_id = p.product_id)
         as average_income_all
     from sales as s
     left join products as p on s.product_id = p.product_id
     inner join employees as e on s.sales_person_id = e.employee_id
     group by seller
-    )
+)
 
 select
     seller,
@@ -70,8 +70,8 @@ order by age_category;
 
 --количество покупателей и выручка по месяцам:
 select
-    TO_CHAR(sale_date, 'YYYY-MM') as selling_month,
-    COUNT(distinct customer_id) as total_customers,
+    TO_CHAR(s.sale_date, 'YYYY-MM') as selling_month,
+    COUNT(distinct s.customer_id) as total_customers,
     FLOOR(SUM(s.quantity * p.price)) as income
 from sales as s
 left join products as p on s.product_id = p.product_id
@@ -80,12 +80,13 @@ order by selling_month asc;
 
 --покупатели, первая покупка которых пришлась на время специальных акций:
 with tab as (
-    select distinct s.customer_id,
-p.price,
-first_value(s.sales_id) OVER(partition by s.customer_id order by s.sale_date asc, p.price asc) as sales_id
-from sales as s
-left join products p on s.product_id = p.product_id
-where price = 0
+    select distinct
+        s.customer_id,
+        p.price,
+        first_value(s.sales_id) OVER(partition by s.customer_id order by s.sale_date asc, p.price asc) as sales_id
+    from sales as s
+    left join products as p on s.product_id = p.product_id
+    where price = 0
 )
 
 select
