@@ -22,8 +22,8 @@ with tab as (
         (select FLOOR(AVG(s.quantity * p.price))
         from sales as s
         left join products as p on s.product_id = p.product_id)
-    as average_income_all
-        from sales as s
+        as average_income_all
+    from sales as s
     left join products as p on s.product_id = p.product_id
     inner join employees as e on s.sales_person_id = e.employee_id
     group by seller
@@ -38,16 +38,16 @@ order by average_income asc;
 
 --выручка продавцов по дням недели:
 with tab as (
-select
-CONCAT(e.first_name, ' ', e.last_name) as seller,
-to_char(s.sale_date, 'day') as day_of_week,
-EXTRACT(isodow from s.sale_date) as day_number,
-FLOOR(SUM(s.quantity * p.price)) as income
-from sales s
-inner join employees e on s.sales_person_id = e.employee_id
-left join products p on s.product_id = p.product_id
-group by seller, day_of_week, day_number
-order by day_number, seller
+    select
+        CONCAT(e.first_name, ' ', e.last_name) as seller,
+        to_char(s.sale_date, 'day') as day_of_week,
+        EXTRACT(isodow from s.sale_date) as day_number,
+        FLOOR(SUM(s.quantity * p.price)) as income
+    from sales as s
+    inner join employees as e on s.sales_person_id = e.employee_id
+    left join products as p on s.product_id = p.product_id
+    group by seller, day_of_week, day_number
+    order by day_number, seller
 )
 
 select
