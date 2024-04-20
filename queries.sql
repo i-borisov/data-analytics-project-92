@@ -85,12 +85,13 @@ with tab as (
     select distinct
         s.customer_id,
         p.price,
-        FIRST_VALUE(s.sales_id) OVER(partition by s.customer_id
+        FIRST_VALUE(s.sales_id)
+            over (partition by s.customer_id
             order by s.sale_date asc, p.price asc)
         as sales_id
     from sales as s
     left join products as p on s.product_id = p.product_id
-    where price = 0
+    where p.price = 0
 )
 
 select
@@ -98,7 +99,7 @@ select
     s.sale_date,
     CONCAT(e.first_name, ' ', e.last_name) as seller
 from sales as s
-left join customers as c ON s.customer_id = c.customer_id
+left join customers as c on s.customer_id = c.customer_id
 left join employees as e on s.sales_person_id = e.employee_id
 where s.sales_id in (select tab.sales_id from tab)
 order by s.customer_id;
